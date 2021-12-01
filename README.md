@@ -2,7 +2,7 @@
 A program for solving [Advent of code](https://adventofcode.com/) challenges
 
 It will automatically download the input for the challenge and verify the output.
-Every year of the challenge is supported. To add a solver for a particular challenge create a function using the Year as the namespace name, day as the class name and solve1 or solve2 for part 1 or 2 of the challenge, e.g:
+Every year of the challenge is supported. To add a solver for a particular challenge create a function using the Year as the namespace name, day as the class name and call the method solve1 or solve2 for part 1 or 2 of the challenge, e.g:
 ```csharp
 namespace Year2021
 {
