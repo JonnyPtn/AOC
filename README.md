@@ -19,7 +19,7 @@ namespace Year2021
 This function must take a string as a parameter for the input, and return a string for the output of the solution
 
 ## Requirements
-- [dotnet6.0+ SDK](https://dotnet.microsoft.com/download)
+- [dotnet SDK 6+](https://dotnet.microsoft.com/download)
 
 ## Building and running
 Open a terminal in the root folder and run `dotnet build` or `dotnet run` 
