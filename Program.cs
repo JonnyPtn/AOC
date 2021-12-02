@@ -76,7 +76,7 @@ void checkOutput(DateTime challengeDate, int part, string output)
     }
     else if (responseText.Contains("That's the right answer!") || responseText.Contains("Did you already complete it?"))
     {
-        Console.WriteLine($"{challengeDate.Year} day {challengeDate.Day} challenge completed!");
+        Console.WriteLine($"{challengeDate.Year} day {challengeDate.Day} challenge part {part} completed!");
     }
 }
 
