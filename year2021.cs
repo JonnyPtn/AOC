@@ -184,4 +184,110 @@
             return (Convert.ToUInt32(o2lines[0],2) * Convert.ToUInt32(co2lines[0],2)).ToString(); ;
         }
     }
+
+    public class Day4
+    {
+        class BingoBoard
+        {
+            public List<int> numbers = new List<int>(5 * 5);
+
+            // if wins, returns value, otherwise 0
+            public int processNumber(int number)
+            {
+                for( int i=0; i < numbers.Count(); i++)
+                {
+                    if (number == numbers[i])
+                    {
+                        numbers[i] = 0;
+                    }
+                }
+
+                for (int i = 0; i < 5; i++)
+                {
+                    if (numbers.Skip(i * 5).Take(5).Sum() == 0)
+                    {
+                        return numbers.Sum();
+                    }
+
+                    if (numbers.Where(num => (numbers.IndexOf(num) + i) % 5 == 0 ).Sum() == 0)
+                    {
+                        return numbers.Sum();
+                    }
+                }
+
+                return 0;
+            }
+        }
+
+        List<BingoBoard> fillBoards(List<string> input)
+        {
+            var boards = new List<BingoBoard>();
+
+            while (input.Count() > 0)
+            {
+                boards.Add(new BingoBoard());
+                for (int i = 0; i < 5; i++)
+                {
+                    var boardRow = input[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    for (int j = 0; j < 5; j++)
+                    {
+                        boards.Last().numbers.Add(int.Parse(boardRow[j]));
+                    }
+                }
+                input.RemoveRange(0, 5);
+            }
+            return boards;
+        }
+
+        public string solve1(string input)
+        {
+            var lines = new List<string>(input.Split('\n'));
+            lines.RemoveAll(line => line.Length == 0);
+
+            var numbers = lines[0].Split(',');
+            lines.RemoveAt(0);
+
+            var boards = fillBoards(lines);
+
+            foreach (var number in numbers)
+            {
+                foreach(var board in boards)
+                {
+                    var num = int.Parse(number);
+                    var result = board.processNumber(num);
+                    if (result != 0)
+                    {
+                        return (num * result).ToString();
+                    }
+                }
+            }
+            return "Whoops I shouldn't be here!!";
+        }
+        public string solve2(string input)
+        {
+            var lines = new List<string>(input.Split('\n'));
+            lines.RemoveAll(line => line.Length == 0);
+
+            var numbers = lines[0].Split(',');
+            lines.RemoveAt(0);
+
+            var boards = fillBoards(lines);
+
+
+            foreach (var number in numbers)
+            {
+                var num = int.Parse(number);
+                if (boards.Count() == 1)
+                {
+                    var result = boards[0].processNumber(num);
+                    if (result != 0)
+                    {
+                        return (num * result).ToString();
+                    }
+                }
+                boards.RemoveAll(b => b.processNumber(num) != 0);
+            }
+            return "Whoops I shouldn't be here!!";
+        }
+    }
 }
