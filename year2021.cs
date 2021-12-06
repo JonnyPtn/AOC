@@ -316,7 +316,7 @@ namespace Year2021
             return result;
         }
 
-        List<int> generateGrid(List<Tuple<Vector2,Vector2>> vectors)
+        List<int> generateGrid(List<Tuple<Vector2, Vector2>> vectors)
         {
             var width = (int)vectors.Max(vec => Math.Max(vec.Item1.X, vec.Item2.X)) + 1;
             var height = (int)vectors.Max(vec => Math.Max(vec.Item1.Y, vec.Item2.Y)) + 1;
@@ -372,6 +372,38 @@ namespace Year2021
             var vectors = getVectors(input, true);
             var grid = generateGrid(vectors);
             return grid.FindAll(count => count > 1).Count().ToString();
+        }
+    }
+
+    public class Day6
+    {
+        UInt64 simulateReproduction(List<UInt64> FishBodyClocks, int days)
+        {
+            var bodyClockCounts = Enumerable.Repeat<UInt64>(0, 9).ToList();
+            foreach (var bodyClock in FishBodyClocks)
+            {
+                bodyClockCounts[(int)bodyClock]++;
+            }
+
+            for (var day = 0; day < days; day++)
+            {
+                var spawned = bodyClockCounts[0];
+                bodyClockCounts.RemoveAt(0);
+                bodyClockCounts.Add(spawned);
+                bodyClockCounts[6] += spawned;
+            }
+            return bodyClockCounts.Aggregate((a, b) => a + b);
+        }
+        public string solve1(string input)
+        {
+            var fishBodyClocks = input.Split(',').Select(UInt64.Parse).ToList();
+            return simulateReproduction(fishBodyClocks, 80).ToString();
+        }
+
+        public string solve2(string input)
+        {
+            var fishBodyClocks = input.Split(',').Select(UInt64.Parse).ToList();
+            return simulateReproduction(fishBodyClocks, 256).ToString();
         }
     }
 }
