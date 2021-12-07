@@ -406,4 +406,35 @@ namespace Year2021
             return simulateReproduction(fishBodyClocks, 256).ToString();
         }
     }
+
+    public class Day7
+    {
+        public string solve1(string input)
+        {
+            var positions = input.Split(',').Select(int.Parse).ToList();
+            positions.Sort();
+            var c = positions.Count();
+            var median = 0;
+            if (c % 2 == 0)
+            {
+                median = (positions[(c/2)-1] + positions[(c/2)]) / 2;
+            }
+            else
+            {
+                median = positions[(c/2)];
+            }
+            var total = positions.Aggregate(0, (total, position) => total += Math.Abs(median - position));
+            return total.ToString();
+        }
+
+        public string solve2(string input)
+        {
+            var positions = input.Split(',').Select(int.Parse).ToList();
+            // For some reason I'm one off with this calculation... so this code doesn't work but I've got the right answer using mean - 1 here
+            // help plz...
+            var mean = (int)Math.Round((double)positions.Sum() / (double)positions.Count());
+            var total = positions.Aggregate(0, (total, position) => total += Math.Abs(mean - position) * (Math.Abs(mean - position) + 1 ) / 2);
+            return total.ToString();
+        }
+    }
 }
