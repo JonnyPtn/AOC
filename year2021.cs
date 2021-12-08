@@ -417,11 +417,11 @@ namespace Year2021
             var median = 0;
             if (c % 2 == 0)
             {
-                median = (positions[(c/2)-1] + positions[(c/2)]) / 2;
+                median = (positions[(c / 2) - 1] + positions[(c / 2)]) / 2;
             }
             else
             {
-                median = positions[(c/2)];
+                median = positions[(c / 2)];
             }
             var total = positions.Aggregate(0, (total, position) => total += Math.Abs(median - position));
             return total.ToString();
@@ -433,7 +433,125 @@ namespace Year2021
             // For some reason I'm one off with this calculation... so this code doesn't work but I've got the right answer using mean - 1 here
             // help plz...
             var mean = (int)Math.Round((double)positions.Sum() / (double)positions.Count());
-            var total = positions.Aggregate(0, (total, position) => total += Math.Abs(mean - position) * (Math.Abs(mean - position) + 1 ) / 2);
+            var total = positions.Aggregate(0, (total, position) => total += Math.Abs(mean - position) * (Math.Abs(mean - position) + 1) / 2);
+            return total.ToString();
+        }
+    }
+
+    public class Day8
+    {
+        public string solve1(string input)
+        {
+            var lines = input.Split('\n').ToList();
+            lines.RemoveAll(line => line.Length == 0);
+            var total = 0;
+            foreach (var line in lines)
+            {
+                var outputValues = line.Substring(line.IndexOf('|') + 1).Trim().Split(' ').ToList();
+                var ones = outputValues.Count(str => str.Length == 2);
+                var fours = outputValues.Count(str => str.Length == 4);
+                var sevens = outputValues.Count(str => str.Length == 3);
+                var eights = outputValues.Count(str => str.Length == 7);
+                total += ones + fours + sevens + eights;
+            }
+            return total.ToString();
+        }
+
+        void deduceDigit(string sequence, Dictionary<string, int> currentDigits)
+        {
+            if (currentDigits.ContainsKey(sequence))
+            {
+                return;
+            }
+            else
+            {
+                if (sequence.Length == 2)
+                {
+                    currentDigits.Add(sequence, 1);
+                }
+                else if (sequence.Length == 3)
+                {
+                    currentDigits.Add(sequence, 7);
+                }
+                else if (sequence.Length == 4)
+                {
+                    currentDigits.Add(sequence, 4);
+                }
+                else if (sequence.Length == 7)
+                {
+                    currentDigits.Add(sequence, 8);
+                }
+                else if (sequence.Length == 5)
+                {
+                    if (currentDigits.ContainsValue(1) && currentDigits.ContainsValue(4))
+                    {
+                        if (sequence.Except(currentDigits.First(x => x.Value == 1).Key).Count() == 3)
+                        {
+                            currentDigits.Add(sequence, 3);
+                        }
+                        else if (sequence.Except(currentDigits.First(x => x.Value == 4).Key).Count() == 3)
+                        {
+                            currentDigits.Add(sequence, 2);
+                        }
+                        else
+                        {
+                            currentDigits.Add(sequence, 5);
+                        }
+                    }
+                }
+                else
+                {
+                    if (currentDigits.ContainsValue(5) && currentDigits.ContainsValue(4))
+                    {
+                        if (sequence.Except(currentDigits.First(x => x.Value == 5).Key).Count() == 2)
+                        {
+                            currentDigits.Add(sequence, 0);
+                        }
+                        else if (sequence.Except(currentDigits.First(x => x.Value == 4).Key).Count() == 2)
+                        {
+                            currentDigits.Add(sequence, 9);
+                        }
+                        else
+                        {
+                            currentDigits.Add(sequence, 6);
+                        }
+                    }
+                }
+            }
+        }
+
+        public string solve2(string input)
+        {
+            var lines = input.Split('\n').ToList();
+            lines.RemoveAll(line => line.Length == 0);
+            var total = 0;
+            foreach (var line in lines)
+            {
+                var splitterIndex = line.IndexOf('|');
+                var inputValues = line.Substring(0, splitterIndex).Trim().Split(' ').ToList();
+                var outputValues = line.Substring(splitterIndex + 1).Trim().Split(' ').ToList();
+                var digitMap = new Dictionary<string, int>();
+                while (digitMap.Count() < 10)
+                {
+                    foreach (var digit in inputValues)
+                    {
+                        deduceDigit(digit, digitMap);
+                    }
+                }
+                var displayedValue = "";
+                foreach (var value in outputValues)
+                {
+                    foreach (var digit in digitMap)
+                    {
+                        if (digit.Key.Length == value.Length && digit.Key.Except(value).Count() == 0)
+                        {
+                            displayedValue += digit.Value.ToString().First();
+                            break;
+                        }
+                    }
+                }
+                total += int.Parse(displayedValue);
+            }
             return total.ToString();
         }
     }
