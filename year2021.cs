@@ -555,4 +555,101 @@ namespace Year2021
             return total.ToString();
         }
     }
+
+    public class Day9
+    {
+        public string solve1(string input)
+        {
+            var lowPoints = new List<int>();
+            var lines = input.Split('\n').ToList();
+            lines.RemoveAll(line => line.Length == 0);
+            for (int y = 0; y < lines.Count(); y++)
+            {
+                for (int x = 0; x < lines[y].Count(); x++)
+                {
+                    var point = lines[y][x];
+                    if (y > 0 && lines[y - 1][x] <= point)
+                    {
+                        continue;
+                    }
+                    else if (y < lines.Count() - 1 && lines[y + 1][x] <= point)
+                    {
+                        continue;
+                    }
+                    else if (x > 0 && lines[y][x-1] <= point)
+                    {
+                        continue;
+                    }
+                    else if (x < lines[y].Count() - 1 && lines[y][x + 1] <= point)
+                    {
+                        continue;
+                    }
+                    lowPoints.Add(point - '0');
+                }
+            }
+            return lowPoints.Aggregate(0, (total, point) => total += point + 1).ToString();
+        }
+
+        public string solve2(string input)
+        {
+            var basins = new List<int>();
+            var lines = input.Split('\n').ToList();
+            lines.RemoveAll(line => line.Length == 0);
+            for (int y = 0; y < lines.Count(); y++)
+            {
+                for (int x = 0; x < lines[y].Count(); x++)
+                {
+                    var point = lines[y][x];
+                    if (y > 0 && lines[y - 1][x] <= point)
+                    {
+                        continue;
+                    }
+                    else if (y < lines.Count() - 1 && lines[y + 1][x] <= point)
+                    {
+                        continue;
+                    }
+                    else if (x > 0 && lines[y][x - 1] <= point)
+                    {
+                        continue;
+                    }
+                    else if (x < lines[y].Count() - 1 && lines[y][x + 1] <= point)
+                    {
+                        continue;
+                    }
+
+                    var visited = new bool[lines.Count(), lines[y].Count()];
+                    Func<int, int, int> ?searchBasin = null;
+                    searchBasin = (w, h) =>
+                    {
+                        if (searchBasin is null)
+                        {
+                            return 0;
+                        }
+                        var total = 1;
+                        visited[h, w] = true;
+                        if (h > 0 && !visited[h - 1, w] && lines[h - 1][w] != '9')
+                        {
+                            total += searchBasin(w, h - 1);
+                        }
+                        if (h < lines.Count() - 1 && !visited[h + 1, w] && lines[h + 1][w] != '9')
+                        {
+                            total += searchBasin(w, h + 1);
+                        }
+                        if (w > 0 && !visited[h, w - 1] && lines[h][w - 1] != '9')
+                        {
+                            total += searchBasin(w - 1, h);
+                        }
+                        if (w < lines[h].Count() - 1 && !visited[h, w + 1] && lines[h][w + 1] != '9')
+                        {
+                            total += searchBasin(w + 1, h);
+                        }
+                        return total;
+                    };
+                    basins.Add(searchBasin(x, y));
+                }
+            }
+            basins.Sort();
+            return basins.TakeLast(3).Aggregate((total, i) => total * i ).ToString();
+        }
+    }
 }
