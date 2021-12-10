@@ -576,7 +576,7 @@ namespace Year2021
                     {
                         continue;
                     }
-                    else if (x > 0 && lines[y][x-1] <= point)
+                    else if (x > 0 && lines[y][x - 1] <= point)
                     {
                         continue;
                     }
@@ -618,7 +618,7 @@ namespace Year2021
                     }
 
                     var visited = new bool[lines.Count(), lines[y].Count()];
-                    Func<int, int, int> ?searchBasin = null;
+                    Func<int, int, int>? searchBasin = null;
                     searchBasin = (w, h) =>
                     {
                         if (searchBasin is null)
@@ -649,7 +649,137 @@ namespace Year2021
                 }
             }
             basins.Sort();
-            return basins.TakeLast(3).Aggregate((total, i) => total * i ).ToString();
+            return basins.TakeLast(3).Aggregate((total, i) => total * i).ToString();
+        }
+    }
+
+    public class Day10
+    {
+        Tuple<ulong, ulong> getErrorAndAutocompleteScore(string input)
+        {
+            var lines = input.Split('\n').ToList();
+            lines.RemoveAll(line => line.Length == 0);
+            ulong errorScore = 0;
+            var autocompleteScores = new List<ulong>(); ;
+            foreach (var line in lines)
+            {
+                var corrupted = false;
+                var chunks = new Stack<char>();
+                foreach (var c in line)
+                {
+                    switch (c)
+                    {
+                        case '(':
+                        case '[':
+                        case '{':
+                        case '<':
+                            {
+                                chunks.Push(c);
+                                continue;
+                            }
+
+                        case ')':
+                            {
+                                if (chunks.Peek() == '(')
+                                {
+                                    chunks.Pop();
+                                    continue;
+                                }
+                                else
+                                {
+                                    errorScore += 3;
+                                }
+                                break;
+                            }
+                        case ']':
+                            {
+                                if (chunks.Peek() == '[')
+                                {
+                                    chunks.Pop();
+                                    continue;
+                                }
+                                else
+                                {
+                                    errorScore += 57;
+                                }
+                                break;
+                            }
+                        case '}':
+                            {
+                                if (chunks.Peek() == '{')
+                                {
+                                    chunks.Pop();
+                                    continue;
+                                }
+                                else
+                                {
+                                    errorScore += 1197;
+                                }
+                                break;
+                            }
+                        case '>':
+                            {
+                                if (chunks.Peek() == '<')
+                                {
+                                    chunks.Pop();
+                                    continue;
+                                }
+                                else
+                                {
+                                    errorScore += 25137;
+                                }
+                                break;
+                            }
+                    }
+                    corrupted = true;
+                    break;
+                }
+                if (!corrupted)
+                {
+                    ulong score = 0;
+                    foreach (var chunk in chunks)
+                    {
+                        score *= 5;
+                        switch (chunk)
+                        {
+                            case '(':
+                                {
+                                    score += 1;
+                                    break;
+                                }
+                            case '[':
+                                {
+                                    score += 2;
+                                    break;
+                                }
+                            case '{':
+                                {
+                                    score += 3;
+                                    break;
+                                }
+                            case '<':
+                                {
+                                    score += 4;
+                                    break;
+                                }
+                        }
+                    }
+                    autocompleteScores.Add(score);
+                }
+            }
+            autocompleteScores.Sort();
+            var middleAutocompleteScore = autocompleteScores[(autocompleteScores.Count / 2)];
+            return Tuple.Create(errorScore, middleAutocompleteScore);
+        }
+        public string solve1(string input)
+        {
+            var scores = getErrorAndAutocompleteScore(input);
+            return scores.Item1.ToString();
+        }
+        public string solve2(string input)
+        {
+            var scores = getErrorAndAutocompleteScore(input);
+            return scores.Item2.ToString();
         }
     }
 }
