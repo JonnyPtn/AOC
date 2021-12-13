@@ -782,4 +782,192 @@ namespace Year2021
             return scores.Item2.ToString();
         }
     }
+
+    public class Day11
+    {
+        public string solve1(string input)
+        {
+            var rows = input.Split('\n').ToList();
+            rows.RemoveAll(row => row.Length == 0);
+            var width = rows.First().Length;
+            var height = rows.Count();
+            int[,] grid = new int[width, height];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    grid[x, y] = Convert.ToInt32(rows[y][x] - '0');
+                }
+            }
+
+            int totalFlashes = 0;
+            for (int step = 0; step < 100; step++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        grid[x, y]++;
+                    }
+                }
+
+                bool[,] flashed = new bool[width, height];
+                bool stillFlashing = true;
+                while (stillFlashing)
+                {
+                    stillFlashing = false;
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            if (!flashed[x, y] && grid[x, y] > 9)
+                            {
+                                flashed[x, y] = true;
+                                totalFlashes++;
+                                stillFlashing = true;
+                                if (x > 0)
+                                {
+                                    grid[x - 1, y]++;
+                                    if (y > 0)
+                                    {
+                                        grid[x - 1, y - 1]++;
+                                    }
+                                    if (y < height - 1)
+                                    {
+                                        grid[x - 1, y + 1]++;
+                                    }
+                                }
+                                if (x < width - 1)
+                                {
+                                    grid[x + 1, y]++;
+                                    if (y > 0)
+                                    {
+                                        grid[x + 1, y - 1]++;
+                                    }
+                                    if (y < height - 1)
+                                    {
+                                        grid[x + 1, y + 1]++;
+                                    }
+                                }
+                                if (y > 0)
+                                {
+                                    grid[x, y - 1]++;
+                                }
+                                if (y < height - 1)
+                                {
+                                    grid[x, y + 1]++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (grid[x, y] > 9)
+                        {
+                            grid[x, y] = 0;
+                        }
+                    }
+                }
+            }
+            return totalFlashes.ToString();
+        }
+        public string solve2(string input)
+        {
+            var rows = input.Split('\n').ToList();
+            rows.RemoveAll(row => row.Length == 0);
+            var width = rows.First().Length;
+            var height = rows.Count();
+            int[,] grid = new int[width, height];
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    grid[x, y] = Convert.ToInt32(rows[y][x] - '0');
+                }
+            }
+
+            int totalFlashes = 0;
+            for (int step = 0; step < int.MaxValue; step++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        grid[x, y]++;
+                    }
+                }
+
+                bool[,] flashed = new bool[width, height];
+                bool stillFlashing = true;
+                while (stillFlashing)
+                {
+                    stillFlashing = false;
+                    for (int x = 0; x < width; x++)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            if (!flashed[x, y] && grid[x, y] > 9)
+                            {
+                                flashed[x, y] = true;
+                                if (flashed.Cast<bool>().All(b => b))
+                                {
+                                    return (step + 1).ToString();
+                                }
+                                totalFlashes++;
+                                stillFlashing = true;
+                                if (x > 0)
+                                {
+                                    grid[x - 1, y]++;
+                                    if (y > 0)
+                                    {
+                                        grid[x - 1, y - 1]++;
+                                    }
+                                    if (y < height - 1)
+                                    {
+                                        grid[x - 1, y + 1]++;
+                                    }
+                                }
+                                if (x < width - 1)
+                                {
+                                    grid[x + 1, y]++;
+                                    if (y > 0)
+                                    {
+                                        grid[x + 1, y - 1]++;
+                                    }
+                                    if (y < height - 1)
+                                    {
+                                        grid[x + 1, y + 1]++;
+                                    }
+                                }
+                                if (y > 0)
+                                {
+                                    grid[x, y - 1]++;
+                                }
+                                if (y < height - 1)
+                                {
+                                    grid[x, y + 1]++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        if (grid[x, y] > 9)
+                        {
+                            grid[x, y] = 0;
+                        }
+                    }
+                }
+            }
+            return totalFlashes.ToString();
+        }
+    }
 }
