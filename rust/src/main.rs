@@ -1,4 +1,5 @@
 use chrono::{Duration, FixedOffset, Utc, NaiveDate, Datelike};
+use enum_iterator::{next, previous, Sequence};
 use reqwest::{blocking::ClientBuilder, Error, header};
 use std::{collections::HashMap, env, io::Write};
 
@@ -56,8 +57,9 @@ fn main() -> Result<(), Error> {
     };
 
     // Map of functions to solve the challenges
-    let mut solvers = HashMap::new();
+    let mut solvers = HashMap::<u32, fn(&String, i8)->String>::new();
     solvers.insert(1, solve1);
+    solvers.insert(2, solve2);
 
     // Iterate every unlocked day
     let now = Utc::now();
@@ -107,4 +109,62 @@ fn solve1(input: &String, level: i8) -> String {
         let (_, largest) = calories.split_at(calories.len() - 3);
         return largest.iter().sum::<i64>().to_string();
     }
+}
+
+fn solve2(input: &String, level: i8) -> String {
+    // Each line is a rock paper scissors round 
+    // First character is what the opponent plays (A, B, C respectively)
+    // Second is what you should play (X, Y, Z respectively)
+    // Each round score is the shape you picked (1, 2, 3 points respectively), 3 points for a draw and 6 for a win (0 for a loss)
+
+    #[derive(Clone, PartialEq, Eq, Sequence)]
+    enum Pick {
+        Rock,
+        Paper,
+        Scissors
+    }
+    struct Round(Pick,Pick);
+    
+    // Part 1 - get total score
+    let mut total_score = 0;
+    for line in input.lines() {
+        let opponent = match line.chars().next().unwrap() {
+            'A' => Pick::Rock,
+            'B' => Pick::Paper,
+            _ => Pick::Scissors,
+        };
+        let mut me = match line.chars().last().unwrap() {
+            'X' => Pick::Rock,
+            'Y' => Pick::Paper,
+            _ => Pick::Scissors,
+        };
+
+        if level == 2 {
+            // For level 2 the second char is actually desired result
+            // X, Y, Z for lose, draw, win respectively
+            // So need to work out what we should pick to get desired result
+            match me {
+                Pick::Rock => me = previous(&opponent).or(Some(Pick::Scissors)).unwrap(), // lose
+                Pick::Paper => me = opponent.clone(), // draw
+                Pick::Scissors => me = next(&opponent).or(Some(Pick::Rock)).unwrap(), // win
+            }
+        }
+
+        let pick_score = match me {
+            Pick::Rock => 1,
+            Pick::Paper => 2,
+            Pick::Scissors => 3,
+        };
+        let round_score = if opponent == me {3} else {
+            match Round(opponent, me) {
+                Round(Pick::Rock, Pick::Paper) |
+                Round(Pick::Paper, Pick::Scissors) |
+                Round(Pick::Scissors, Pick::Rock) => 6,
+                _ => 0,
+            }
+        };
+        total_score += pick_score + round_score;
+    }
+
+    return total_score.to_string();
 }
