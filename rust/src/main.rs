@@ -39,7 +39,6 @@ fn main() -> Result<(), Error> {
         params.insert("level", level.to_string());
         params.insert("answer",answer.to_string());
         let response = client.post(&url).form(&params).send().unwrap().text().unwrap();
-        file.write_all(response.as_bytes()).unwrap();
         if response.contains("That's not the right answer") {
             return true;
         }
