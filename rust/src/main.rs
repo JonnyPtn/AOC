@@ -1,7 +1,8 @@
 use chrono::{Duration, FixedOffset, Utc, NaiveDate, Datelike};
 use enum_iterator::{next, previous, Sequence};
+use itertools::Itertools;
 use reqwest::{blocking::ClientBuilder, Error, header};
-use std::{collections::HashMap, env, io::Write};
+use std::{collections::HashMap, collections::HashSet, env, io::Write};
 
 fn main() -> Result<(), Error> {
 
@@ -60,6 +61,7 @@ fn main() -> Result<(), Error> {
     let mut solvers = HashMap::<u32, fn(&String, i8)->String>::new();
     solvers.insert(1, solve1);
     solvers.insert(2, solve2);
+    solvers.insert(3, solve3);
 
     // Iterate every unlocked day
     let now = Utc::now();
@@ -167,4 +169,40 @@ fn solve2(input: &String, level: i8) -> String {
     }
 
     return total_score.to_string();
+}
+
+fn solve3(input: &String, level: i8) -> String {
+    let mut priorities = Vec::new();
+    for character in 'a'..='z' {
+        priorities.push(character);
+    }
+    for character in 'A'..='Z' {
+        priorities.push(character);
+    }
+    
+    let mut sum = 0;
+
+    if level == 1 {
+        for line in input.lines() {
+            let (left, right) = line.split_at(line.len()/2);
+            let left_set: HashSet<char> = left.chars().collect();
+            let right_set: HashSet<char> = right.chars().collect();
+            let common: HashSet<&char> = left_set.intersection(&right_set).collect();
+            for character in common {
+                sum += priorities.iter().position(|c| c == character).unwrap() + 1;
+            }
+        }
+    }
+    else {
+        for chunk in &input.lines().into_iter().chunks(3) {
+            let iter: Vec<&str> = chunk.collect();
+            let first: HashSet<char> = iter[0].chars().collect();
+            let second: HashSet<char> = iter[1].chars().collect();
+            let third: HashSet<char> = iter[2].chars().collect();
+            let badge = first.intersection(&second).filter(|c| third.contains(c)).nth(0).unwrap();
+            sum += priorities.iter().position(|c| c == badge).unwrap() + 1;
+        }
+    }
+
+    return sum.to_string();
 }
