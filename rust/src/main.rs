@@ -1,6 +1,7 @@
 use chrono::{Duration, FixedOffset, Utc, NaiveDate, Datelike};
 use enum_iterator::{next, previous, Sequence};
 use itertools::Itertools;
+use regex::Regex;
 use reqwest::{blocking::ClientBuilder, Error, header};
 use std::{collections::HashMap, collections::HashSet, env, io::Write};
 
@@ -42,7 +43,7 @@ fn main() -> Result<(), Error> {
         params.insert("answer",answer.to_string());
         let response = client.post(&url).form(&params).send().unwrap().text().unwrap();
         if response.contains("That's not the right answer") {
-            return true;
+            return false;
         }
         else if response.contains("You gave an answer too recently") {
             eprintln!("Answering too quickly, wait a bit and try again");
@@ -62,6 +63,7 @@ fn main() -> Result<(), Error> {
     solvers.insert(1, solve1);
     solvers.insert(2, solve2);
     solvers.insert(3, solve3);
+    solvers.insert(4, solve4);
 
     // Iterate every unlocked day
     let now = Utc::now();
@@ -205,4 +207,30 @@ fn solve3(input: &String, level: i8) -> String {
     }
 
     return sum.to_string();
+}
+
+fn solve4(input: &String, level: i8) -> String {
+    let mut answer = 0;
+    for line in input.lines() {
+        // Input is "A-B,X-Y"
+        let re = Regex::new(r"^(\d+)-(\d+),(\d+)-(\d+)$").unwrap();
+        let captures = re.captures(line).unwrap();
+        assert_eq!(captures.len(), 5);
+        let a: u64 = captures.get(1).unwrap().as_str().parse().unwrap();
+        let b: u64 = captures.get(2).unwrap().as_str().parse().unwrap();
+        let x: u64 = captures.get(3).unwrap().as_str().parse().unwrap();
+        let y: u64 = captures.get(4).unwrap().as_str().parse().unwrap();
+        assert!(a <= b && x <=y);
+        if level == 1 && (a <= x && b >= y) || (x <= a && y >= b) {
+            answer += 1; // fully contained
+        }
+        else if level == 2 {
+            let first: HashSet<u64> = (a..=b).collect();
+            let second: HashSet<u64> = (x..=y).collect(); 
+            if first.intersection(&second).count() > 0 {
+                answer += 1;
+            }
+        } 
+    }
+    return answer.to_string();
 }
