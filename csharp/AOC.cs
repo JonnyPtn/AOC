@@ -48,16 +48,20 @@ static class AOC
     public static void answer(int year, int day, int part, string answer)
     {
         // Check if we've already succesfully answered
-        var cacheFile = new FileInfo($"{cache_root}/{year}/{day}");
+        var cacheFile = new FileInfo($"{cache_root}/{year}/{day}/answer{part}");
         if (cacheFile.Exists)
         {
             var cachedAnswer = File.ReadAllText(cacheFile.FullName);
             if (cachedAnswer == answer)
             {
-                Console.WriteLine();
+                Console.WriteLine("Correct answer already cached");
+                return;
             }
         }
-        
+        if (!client.DefaultRequestHeaders.Contains("Cookie"))
+        {
+            client.DefaultRequestHeaders.Add("Cookie", $"session={Environment.GetEnvironmentVariable("AOC_COOKIE")}");
+        }
         var challenge_uri = new Uri(base_uri, $"{year}/day/{day}/answer");
         var formContent = new FormUrlEncodedContent(new[]
         {
@@ -84,6 +88,11 @@ static class AOC
         else if (responseText.Contains("That's the right answer!") || responseText.Contains("Did you already complete it?"))
         {
             Console.WriteLine($"{year} day {day} challenge part {part} completed!");
+            File.WriteAllText(cacheFile.FullName, answer);
+        }
+        else
+        {
+            Console.WriteLine("Confusing response from website...");
         }
     }
 }
