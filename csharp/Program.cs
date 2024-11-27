@@ -4,7 +4,7 @@
 // then set it to an environment variable called AOC_COOKIE
 
 using System.Net;
-using Year2021;
+using year2021;
 
 var cookie = Environment.GetEnvironmentVariable("AOC_COOKIE");
 if (cookie == null)

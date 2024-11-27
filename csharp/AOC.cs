@@ -1,4 +1,4 @@
-﻿namespace Year2021;
+﻿namespace year2021;
 
 static class AOC
 {
