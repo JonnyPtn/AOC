@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using System.Xml.Schema;
 
 namespace Year2015
 {
@@ -52,8 +53,26 @@ namespace Year2015
                 var h = int.Parse(lwh[2]);
                 var area = 2 * l * w + 2 * w * h + 2 * h * l;
                 total += area + new[] { l * w, w * h, h * l }.Min();
-
+            }
+            return total.ToString();
         }
+        public string solve2(string input)
+        {
+            //The ribbon required to wrap a present is the shortest distance around its sides
+            var dimensions = input.Split("\n").Where(s => !string.IsNullOrEmpty(s));
+            var total = 0;
+            foreach (var dim in dimensions)
+            {
+                var lwh = dim.Split('x');
+                var l = int.Parse(lwh[0]);
+                var w = int.Parse(lwh[1]);
+                var h = int.Parse(lwh[2]);
+                List<int> values = new() { l, w, h };
+                // ribbon required for the perfect bow is equal to the cubic feet of volume of the present
+                var bowLength = values.Aggregate((a, b) => a * b);
+                values.Remove(values.Max());
+                total += values[0] * 2 + values[1] * 2 + bowLength;
+            }
             return total.ToString();
         }
     }
