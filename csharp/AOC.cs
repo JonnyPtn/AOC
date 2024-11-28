@@ -63,7 +63,7 @@ static class AOC
         var incorrectFile = new FileInfo($"{cache_root}/{year}/{day}/incorrect{part}");
         if (incorrectFile.Exists)
         {
-            var incorrectAnswer = File.ReadAllText(cacheFile.FullName);
+            var incorrectAnswer = File.ReadAllText(incorrectFile.FullName);
             if (incorrectAnswer == answer)
             {
                 Console.WriteLine("Incorrect answer already tried");

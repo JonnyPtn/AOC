@@ -36,4 +36,25 @@ namespace Year2015
             return input.Length.ToString();
         }
     }
+
+    public class Day2
+    {
+        public string solve1(string input)
+        {
+            // find area of cuboid - 2*l*w + 2*w*h + 2*h*l
+            var dimensions = input.Split("\n").Where(s => !string.IsNullOrEmpty(s));
+            int total = 0;
+            foreach (var dim in dimensions)
+            {
+                var lwh = dim.Split('x');
+                var l = int.Parse(lwh[0]);
+                var w = int.Parse(lwh[1]);
+                var h = int.Parse(lwh[2]);
+                var area = 2 * l * w + 2 * w * h + 2 * h * l;
+                total += area + new[] { l * w, w * h, h * l }.Min();
+
+        }
+            return total.ToString();
+        }
+    }
 }
