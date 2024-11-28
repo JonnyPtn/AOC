@@ -58,6 +58,19 @@ static class AOC
                 return;
             }
         }
+
+        // Also check if we already gave this as an incorrect answer
+        var incorrectFile = new FileInfo($"{cache_root}/{year}/{day}/incorrect{part}");
+        if (incorrectFile.Exists)
+        {
+            var incorrectAnswer = File.ReadAllText(cacheFile.FullName);
+            if (incorrectAnswer == answer)
+            {
+                Console.WriteLine("Incorrect answer already tried");
+                return;
+            }
+        }
+
         if (!client.DefaultRequestHeaders.Contains("Cookie"))
         {
             client.DefaultRequestHeaders.Add("Cookie", $"session={Environment.GetEnvironmentVariable("AOC_COOKIE")}");
@@ -80,10 +93,8 @@ static class AOC
         }
         else if (responseText.Contains("That's not the right answer"))
         {
-            var firstIndex = responseText.IndexOf("<code>") + 6;
-            var lastIndex = responseText.IndexOf("</code>");
-            var guess = responseText.Substring(firstIndex, lastIndex - firstIndex);
-            Console.WriteLine($"{year} day {day} challenge failed, you guessed: {guess}");
+            Console.WriteLine($"{year} day {day} challenge failed");
+            File.WriteAllText(incorrectFile.FullName, answer);
         }
         else if (responseText.Contains("That's the right answer!") || responseText.Contains("Did you already complete it?"))
         {

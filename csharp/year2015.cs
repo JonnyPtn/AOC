@@ -13,5 +13,27 @@ namespace Year2015
             var down = input.Count(f => f == ')');
             return (up - down).ToString();
         }
+        public string solve2(string input)
+        {
+            // Find the first time the floor goes negative
+            var floor = 0;
+            for (var i = 0; i < input.Length; i++)
+            {
+                var c = input[i];
+                if (c == '(')
+                {
+                    floor++;
+                }
+                else
+                {
+                    floor--;
+                }
+                if (floor < 0)
+                {
+                    return (i + 1).ToString();
+                }
+            }
+            return input.Length.ToString();
+        }
     }
 }
