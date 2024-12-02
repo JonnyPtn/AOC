@@ -54,7 +54,12 @@ static class AOC
             var cachedAnswer = File.ReadAllText(cacheFile.FullName);
             if (cachedAnswer == answer)
             {
-                Console.WriteLine("Correct answer already cached");
+                Console.WriteLine($"Correct answer already cached: {answer}");
+                return;
+            }
+            else if (cachedAnswer == "Unknown")
+            {
+                Console.WriteLine($"Challenge already completed, you gave {answer} as the answer but we have no cache to verify with");
                 return;
             }
         }
@@ -66,7 +71,7 @@ static class AOC
             var incorrectAnswer = File.ReadAllText(incorrectFile.FullName);
             if (incorrectAnswer == answer)
             {
-                Console.WriteLine("Incorrect answer already tried");
+                Console.WriteLine($"Incorrect answer already tried: {answer}");
                 return;
             }
         }
@@ -89,17 +94,22 @@ static class AOC
         {
             var firstIndex = responseText.IndexOf("You");
             var lastIndex = responseText.IndexOf("wait.") + 5;
-            Console.WriteLine(responseText.Substring(firstIndex, lastIndex - firstIndex));
+            Console.WriteLine($"{responseText.Substring(firstIndex, lastIndex - firstIndex)}, attempted answer: {answer}");
         }
         else if (responseText.Contains("That's not the right answer"))
         {
-            Console.WriteLine($"{year} day {day} challenge failed");
+            Console.WriteLine($"{year} day {day} challenge failed, incorrect answer: {answer}");
             File.WriteAllText(incorrectFile.FullName, answer);
         }
-        else if (responseText.Contains("That's the right answer!") || responseText.Contains("Did you already complete it?"))
+        else if (responseText.Contains("That's the right answer!"))
         {
             Console.WriteLine($"{year} day {day} challenge part {part} completed!");
             File.WriteAllText(cacheFile.FullName, answer);
+        }
+        else if (responseText.Contains("Did you already complete it?"))
+        {
+            Console.WriteLine($"{year} day {day} part {part} already completed, but no cached answer to verify against");
+            File.WriteAllText(cacheFile.FullName, "Unknown");
         }
         else
         {

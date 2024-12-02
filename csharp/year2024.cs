@@ -55,4 +55,60 @@ namespace Year2024
             return sum.ToString();
         }
     }
+
+    public class Day2
+    {
+        static bool is_safe(List<int> levels)
+        {
+            bool increasing = levels[0] < levels[1];
+            for (int i = 1; i < levels.Count; i++)
+            {
+                var current = levels[i];
+                var last = levels[i - 1];
+                var diff = current - last;
+                var abs_diff = Math.Abs(diff);
+                if (increasing && diff <= 0 || !increasing && diff >= 0 || abs_diff < 1 || abs_diff > 3)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public string solve1(string input)
+        {
+            // Input are lists of numbers, we need to count how many are "safe"
+            // meaning they only increase or decrease, and only ever by 1 to 3 inclusive
+            var lines = input.Split('\n').Where(s => s.Length > 0);
+            return lines.Where(x => is_safe(x.Split(' ').Select(int.Parse).ToList())).Count().ToString();
+        }
+
+        public static string solve2(string input)
+        {
+            // as above but check each variation with 1 missing number
+            var lines = input.Split('\n').Where(s => s.Length > 0).ToList();
+            var count = 0;
+            foreach (var line in lines)
+            {
+                var list = line.Split(' ').Select(int.Parse).ToList();
+                if (is_safe(list))
+                {
+                    count++;
+                }
+                else
+                {
+                    for (int i = 0; i < list.Count(); i++)
+                    {
+                        var temp_list = new List<int>(list);
+                        temp_list.RemoveAt(i);
+                        if (is_safe(temp_list))
+                        {
+                            count++;
+                            break;
+                        }
+                    }
+                }
+            }
+            return count.ToString();
+        }
+    }
 }
