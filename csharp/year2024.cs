@@ -111,4 +111,45 @@ namespace Year2024
             return count.ToString();
         }
     }
+
+    public class Day3
+    {
+        public string solve1(string input)
+        {
+            // find "instructions" matching the pattern `mul(X,Y)`
+            // and sum the results of multiplying X*Y for those
+            // Surely must be regex...
+            string pattern = @"mul\((\d+),(\d+)\)";
+            var reg = new Regex(pattern);
+            var matches = reg.Matches(input);
+            var sum = 0;
+            foreach (Match match in matches)
+            {
+                var x = int.Parse(match.Groups[1].Value);
+                var y = int.Parse(match.Groups[2].Value);
+                sum += x * y;
+            }
+            return sum.ToString();
+        }
+
+        public string solve2(string input)
+        {
+            // Now there's interspersed do/don't instructions to
+            // enable/disable instructions. Seems simplest to just
+            // strip any disabled instructions then use day 1's solution
+            var enable_index = 0;
+            var disable_index = input.IndexOf("don't()");
+            while(disable_index != -1)
+            {
+                enable_index = input.IndexOf("do()", disable_index);
+                if (enable_index == -1)
+                {
+                    enable_index = input.Length;
+                }
+                input = input.Remove(disable_index, enable_index - disable_index);
+                disable_index = input.IndexOf("don't()");
+            }
+            return solve1(input);
+        }
+    }
 }
